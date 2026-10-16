@@ -25,7 +25,7 @@ jobs:
         - name: SonarQube Scan
           run: sonar-scanner 
                -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-               -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+               -Dsonar.host.url=${{ secrets.SONAR_URL }}
                -Dsonar.login=${{ secrets.SONAR_TOKEN }}  
                -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
                -Dsonar.sources=${GITHUB_WORKSPACE}/src/
@@ -33,7 +33,7 @@ jobs:
                -Dsonar.jacoco.reportPaths=${GITHUB_WORKSPACE}/target/jacoco.exec
                -Dsonar.java.checkstyle.reportPaths=${GITHUB_WORKSPACE}/target/checkstyle-result.xml
                -Dsonar.java.binaries=${GITHUB_WORKSPACE}/target/classes/
-               
+
 
 
 
