@@ -29,9 +29,5 @@ jobs:
             mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
               -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
               -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
-              -Dsonar.sources=src/ \
-              -Dsonar.junit.reportPaths=target/surefire-reports/ \
-              -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-              -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml \
-              -Dsonar.java.binaries=target/classes/
+              -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+
