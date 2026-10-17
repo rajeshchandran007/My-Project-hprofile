@@ -5,7 +5,7 @@ COPY ./ .
 RUN mvn clean install 
 
 # Stage 2: Deploy to Tomcat running Java 21
-FROM tomcat:10.1-jdk21
+FROM tomcat:9.0-jdk21-temurin
 LABEL "Project"="Vprofile"
 LABEL "Author"="Rajesh"
 
