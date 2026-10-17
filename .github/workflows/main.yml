@@ -76,20 +76,16 @@ jobs:
       # - name: Push Docker Image to ECR
       #   run: docker push ${{ secrets.REGISTRY }}/github-actions-ecr-app:latest
 
-      - name: Build, Tag, Authenticate,and Push to Amazon ECR
-        uses: appleboy/docker-ecr-action@v0.0.4
+      - name: Build, Tag, Authenticate, and Push to Amazon ECR
+        uses: appleboy/docker-ecr-action@master  # Resolves the version resolution error
         with:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           registry: ${{ secrets.AWS_ECR_REGISTRY }}
           region: ${{ env.AWS_REGION }}
           repo: github-actions-ecr-app
-          
-          # Custom path configurations
-          # dockerfile: ./path/to/your/Dockerfile  # Defaults to 'Dockerfile' if omitted
-          context: ./                            # The build context directory (Defaults to repository root)
-          
-          # Custom tags (comma-separated for multi-tag support)
-          # tags: latest,${{ github.sha }}
-          tags: latest,${{ github.run_number }}  # Using GitHub Actions run number as a tag
+          dockerfile: ./Dockerfile
+          context: ./
+          tags: latest,${{ github.sha }}
+
 
