@@ -1,5 +1,5 @@
 name: Hprofile Actions
-on: workflow_dispatch
+on: [push, workflow_dispatch]
 env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: github-actions-ecr-app
