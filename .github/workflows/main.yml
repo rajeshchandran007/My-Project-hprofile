@@ -87,7 +87,7 @@ jobs:
         with:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: ${{ secrets.AWS_ECR_REGISTRY }}
+          registry: ${{ secrets.REGISTRY }}
           region: ${{ env.AWS_REGION }}
           repo: github-actions-ecr-app
           dockerfile: ./Dockerfile
@@ -115,7 +115,7 @@ jobs:
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ secrets.AWS_ECR_REGISTRY }}/github-actions-ecr-app:${{ github.run_number }}
+          image: ${{ secrets.REGISTRY }}/github-actions-ecr-app:${{ github.run_number }}
 
       - name: Deploy to Amazon ECS service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
