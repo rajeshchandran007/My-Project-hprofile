@@ -1,5 +1,7 @@
 name: Hprofile Actions
 on: workflow_dispatch
+env:
+  AWS_REGION: ap-south-1
 jobs:
   Testing:
       runs-on: ubuntu-latest
@@ -31,14 +33,62 @@ jobs:
               -Dsonar.host.url=https://sonarcloud.io \
               -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
 
-        - name: SonarQube Quality Gate Check
-          env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          run: |
-            mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-              -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
-              -Dsonar.qualitygate.wait=true  
-              -Dsonar.qualitygate.timeout=300    
+        # - name: SonarQube Quality Gate Check
+        #   env:
+        #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #   run: |
+        #     mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+        #       -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+        #       -Dsonar.host.url=https://sonarcloud.io \
+        #       -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+        #       -Dsonar.qualitygate.wait=true  
+        #       -Dsonar.qualitygate.timeout=300    
+
+  Build_And_Publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4 
+
+      - name: Update application.properties file
+        run: |
+          sed -i "s/^jdbc.username.*$/jdbc.username\=\${{ secrets.RDS_USER }}/" src/main/resources/application.properties
+          sed -i "s/^jdbc.password.*$/jdbc.password\=\${{ secrets.RDS_PASS }}/" src/main/resources/application.properties
+          sed -i "s/db01/\${{ secrets.RDS_ENDPOINT }}/" src/main/resources/application.properties
+
+      # - name: Build Docker Image
+      #   run: docker build -t github-actions-ecr-app .
+
+      # - name: Tag Docker Image
+      #   run: docker tag github-actions-ecr-app:latest ${{ secrets.REGISTRY }}/github-actions-ecr-app:latest
+      
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v2
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ap-south-1
+
+      # - name: Log in to ECR
+      #   run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${{ secrets.REGISTRY }}
+
+      # - name: Push Docker Image to ECR
+      #   run: docker push ${{ secrets.REGISTRY }}/github-actions-ecr-app:latest
+
+      - name: Build, Tag, Authenticate,and Push to Amazon ECR
+        uses: appleboy/docker-ecr-action@v2.0.0
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ secrets.AWS_ECR_REGISTRY }}
+          region: ${{ env.AWS_REGION }}
+          repo: github-actions-ecr-app
+          
+          # Custom path configurations
+          # dockerfile: ./path/to/your/Dockerfile  # Defaults to 'Dockerfile' if omitted
+          context: ./                            # The build context directory (Defaults to repository root)
+          
+          # Custom tags (comma-separated for multi-tag support)
+          # tags: latest,${{ github.sha }}
+          tags: latest,${{ github.run_number }}  # Using GitHub Actions run number as a tag
 

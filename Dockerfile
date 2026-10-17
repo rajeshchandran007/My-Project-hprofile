@@ -1,13 +1,17 @@
-FROM openjdk:11 AS BUILD_IMAGE
-RUN apt update && apt install maven -y
-COPY ./ vprofile-project
-RUN cd vprofile-project &&  mvn install 
+# Stage 1: Build the artifact using Maven and Java 21
+FROM maven:3.9-eclipse-temurin-21 AS build_image
+WORKDIR /vprofile-project
+COPY ./ .
+RUN mvn clean install 
 
-FROM tomcat:9-jre11
+# Stage 2: Deploy to Tomcat running Java 21
+FROM tomcat:10.1-jdk21
 LABEL "Project"="Vprofile"
-LABEL "Author"="Imran"
+LABEL "Author"="Rajesh"
+
+# Clear default Tomcat webapps and deploy the artifact
 RUN rm -rf /usr/local/tomcat/webapps/*
-COPY --from=BUILD_IMAGE vprofile-project/target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=build_image /vprofile-project/target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
