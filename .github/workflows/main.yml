@@ -86,6 +86,6 @@ jobs:
           repo: github-actions-ecr-app
           dockerfile: ./Dockerfile
           context: ./
-          tags: latest,${{ github.sha }}
+          tags: latest,${{ github.run_number }}
 
 
